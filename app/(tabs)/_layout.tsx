@@ -1,33 +1,49 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { PRIMARY } from '@/core/theme/colors';
+import { TabBarIcon } from '../../components/TabBarIcon';
+
+const commonTabOptions = {
+  tabBarShowLabel: false,
+  headerShown: false,
+};
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarActiveTintColor: PRIMARY,
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          ...commonTabOptions,
+          title: 'Tab One',
+          tabBarIcon: ({ color }) => <TabBarIcon name="albums" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="favorite"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          ...commonTabOptions,
+          title: 'Favorite',
+          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="bookings"
+        options={{
+          ...commonTabOptions,
+          title: 'Bookings',
+          tabBarIcon: ({ color }) => <TabBarIcon name="calendar-clear" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          ...commonTabOptions,
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <TabBarIcon name="person" color={color} />,
         }}
       />
     </Tabs>
