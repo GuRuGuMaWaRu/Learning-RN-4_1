@@ -68,26 +68,28 @@ const Property = () => {
       <ScrollView className="bg-gray-100 p-4">
         <PropertyImage imageUrl={imageUrl} rating={4.8} isFavorite={property.is_favorite} />
 
-        <View className="flex flex-row items-center justify-between">
-          <Text variant="subtitle-primary" className="mt-4">
-            {property.name}
-          </Text>
-          <View className="flex flex-row items-center justify-center">
-            <Ionicons name="pricetag" size={12} color={PRIMARY} />
-            <Text variant="body-primary" className="ml-2">
-              ${property.price_per_night} per night
+        <View className="mx-6">
+          <View className="flex flex-row items-center justify-between">
+            <Text variant="subtitle-primary" className="mt-4">
+              {property.name}
+            </Text>
+            <View className="flex flex-row items-center justify-center">
+              <Ionicons name="pricetag" size={12} color={PRIMARY} />
+              <Text variant="body-primary" className="ml-2">
+                ${property.price_per_night} per night
+              </Text>
+            </View>
+          </View>
+          <View className="flex flex-row items-center">
+            <Ionicons name="location" size={16} color={PRIMARY} />
+            <Text variant="body-primary" className="">
+              {property.city}, {property.country}
             </Text>
           </View>
-        </View>
-        <View className="flex flex-row items-center">
-          <Ionicons name="location" size={16} color={PRIMARY} />
-          <Text variant="body-primary" className="">
-            {property.city}, {property.country}
+          <Text variant="body" className="mt-1 text-gray-700">
+            {property.description}
           </Text>
         </View>
-        <Text variant="body" className="mt-1 text-gray-700">
-          {property.description}
-        </Text>
         <AmenitiesList amenities={property.amenities} />
       </ScrollView>
 
