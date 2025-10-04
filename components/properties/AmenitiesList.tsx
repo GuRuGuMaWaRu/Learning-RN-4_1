@@ -5,11 +5,11 @@ import Text from '@/components/Text';
 import { PRIMARY } from '@/core/theme/colors';
 
 export type AmenityType =
-  | 'WiFi'
-  | 'Kitchen'
-  | 'Pool'
   | 'Air conditioning'
   | 'Pet friendly'
+  | 'Kitchen'
+  | 'Pool'
+  | 'WiFi'
   | 'Free parking';
 
 const amenityIcon: Record<AmenityType, keyof typeof Ionicons.glyphMap> = {
