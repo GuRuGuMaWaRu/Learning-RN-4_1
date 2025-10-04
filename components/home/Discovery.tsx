@@ -46,7 +46,7 @@ const Discovery = ({ properties }: DiscoveryProps) => {
                 left: 24,
                 right: 24,
               }}>
-              <BlurView intensity={40} tint="dark">
+              <BlurView intensity={80} tint="dark">
                 <Pressable
                   className="flex flex-row items-center justify-between p-4"
                   onPress={() => {
