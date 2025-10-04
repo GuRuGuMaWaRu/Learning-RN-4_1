@@ -24,7 +24,7 @@ const amenityIcon: Record<AmenityType, keyof typeof Ionicons.glyphMap> = {
 type Props = { amenities: string };
 
 const AmenitiesList = ({ amenities }: Props) => {
-  const allAmenities = amenities.split(', ') as AmenityType[];
+  const allAmenities = amenities.split(',').map((a) => a.trim()) as AmenityType[];
 
   return (
     <View className="my-4 flex flex-row flex-wrap justify-evenly">
