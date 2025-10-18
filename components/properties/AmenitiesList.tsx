@@ -28,10 +28,10 @@ const AmenitiesList = ({ amenities }: Props) => {
 
   return (
     <View className="my-4 flex flex-row flex-wrap justify-evenly">
-      {allAmenities.map((amenity, index) => {
+      {allAmenities.map((amenity) => {
         return (
           <View
-            key={index}
+            key={amenity}
             className="mx-2 flex flex-1 items-center justify-center rounded-2xl bg-white p-2">
             <Ionicons name={amenityIcon[amenity]} size={24} color={PRIMARY} />
             <Text variant="body-primary" className="mt-2 text-center">

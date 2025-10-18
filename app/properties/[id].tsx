@@ -2,52 +2,50 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
-  BottomSheetFlashList,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { useDateRange } from '@marceloterreiro/flash-calendar';
-import { FlashList } from '@shopify/flash-list';
 import { useLocalSearchParams } from 'expo-router';
 import { SquircleButton } from 'expo-squircle-view';
-import { useCallback, useRef, useState } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-datepicker';
 
 import Container from '@/components/Container';
 import Header from '@/components/Header';
 import Text from '@/components/Text';
+import AmenitiesList from '@/components/properties/AmenitiesList';
 import PropertyImage from '@/components/properties/PropertyImage';
 import { PROPERTIES, today } from '@/core/constants';
-import { PRIMARY } from '@/core/theme/colors';
-import AmenitiesList from './AmenitiesList';
-
-const SafeFlashList = Platform.select({
-  ios: FlashList,
-  android: BottomSheetFlashList as any,
-});
+import { BACKGROUND_GREY_100, PRIMARY } from '@/core/theme/colors';
 
 const Property = () => {
   const { id } = useLocalSearchParams();
+  const defaultStyles = useDefaultStyles();
 
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [datesRange, setDatesRange] = useState<{
+    startDate: DateType;
+    endDate: DateType;
+  }>({ startDate: undefined, endDate: undefined });
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const renderBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
+  const property = PROPERTIES.find((prop) => prop.id === id) as Property | undefined;
+  const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+  const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => {
+    return (
       <BottomSheetBackdrop
         {...props}
-        disappearsOnIndex={-1}
         appearsOnIndex={0}
+        disappearsOnIndex={-1}
         pressBehavior="close"
       />
-    ),
-    []
-  );
+    );
+  }, []);
 
-  const { calendarActiveDateRanges, onCalendarDayPress } = useDateRange();
-
-  console.log('calendarActiveDateRanges', calendarActiveDateRanges);
-  const property = PROPERTIES.find((prop) => prop.id === id) as Property | undefined;
+  const handleChangeDate = ({ startDate, endDate }: { startDate: DateType; endDate: DateType }) => {
+    setDatesRange({ startDate, endDate });
+  };
 
   if (!property) {
     return (
@@ -65,7 +63,8 @@ const Property = () => {
   return (
     <Container>
       <Header title="Property" />
-      <ScrollView className="bg-gray-100 p-4">
+
+      <ScrollView style={{ flex: 1, padding: 4, backgroundColor: BACKGROUND_GREY_100 }}>
         <PropertyImage imageUrl={imageUrl} rating={4.8} isFavorite={property.is_favorite} />
 
         <View className="mx-6">
@@ -93,74 +92,49 @@ const Property = () => {
         <AmenitiesList amenities={property.amenities} />
       </ScrollView>
 
+      <SquircleButton
+        backgroundColor={PRIMARY}
+        cornerSmoothing={100}
+        preserveSmoothing
+        onPress={() => {
+          bottomSheetRef.current?.expand();
+        }}
+        className="m-8 flex flex-row items-center justify-center px-4"
+        style={{
+          paddingVertical: 16,
+        }}
+        borderRadius={24}>
+        <Ionicons name="checkmark-circle" size={20} color="white" />
+        <Text variant="button" className="mx-2 text-center">
+          Confirm
+        </Text>
+      </SquircleButton>
+
       <BottomSheet
         ref={bottomSheetRef}
-        snapPoints={['50%']}
+        snapPoints={snapPoints}
         backdropComponent={renderBackdrop}
         index={-1}
-        enablePanDownToClose={true}
+        enablePanDownToClose
         enableDynamicSizing={false}>
-        <BottomSheetView style={{ flex: 1 }}>
-          <Text variant="body" className="text-center">
-            Bottom Sheet
-          </Text>
-
-          <BottomSheetView style={{ flex: 1 }}>
-            {/* <Calendar.List
-              onCalendarDayPress={onCalendarDayPress}
-              calendarActiveDateRanges={calendarActiveDateRanges}
-              calendarMinDateId={today}
-              CalendarScrollComponent={SafeFlashList}
-              theme={calendarTheme}
-            /> */}
-            <Text>Selected date: {selectedDate}</Text>
-            {/* <Calendar.List
-              calendarActiveDateRanges={[
-                {
-                  startId: selectedDate,
-                  endId: selectedDate,
-                },
-              ]}
-              calendarInitialMonthId={today}
-              onCalendarDayPress={setSelectedDate}
-            /> */}
-          </BottomSheetView>
-
-          <SquircleButton
-            backgroundColor={PRIMARY}
-            cornerSmoothing={100}
-            preserveSmoothing
-            onPress={() => {
-              bottomSheetRef.current?.close();
+        <BottomSheetView className="pt-14">
+          <DateTimePicker
+            mode="range"
+            minDate={today}
+            startDate={datesRange.startDate}
+            endDate={datesRange.endDate}
+            onChange={handleChangeDate}
+            styles={{
+              ...defaultStyles,
+              today: { borderColor: 'blue', borderWidth: 1 }, // Add a border to today's date
+              selected: { backgroundColor: 'blue' }, // Highlight the selected day
+              selected_label: { color: 'white' }, // Highlight the selected day label
             }}
-            className="m-8 flex flex-row items-center justify-center px-4"
-            style={{
-              paddingVertical: 16,
-            }}
-            borderRadius={24}>
-            <Ionicons name="checkmark-circle" size={20} color="white" />
-            <Text variant="button" className="mx-2 text-center">
-              Confirm
-            </Text>
-          </SquircleButton>
+          />
         </BottomSheetView>
       </BottomSheet>
 
-      <View className="right-0 bottom-0 left-0 -z-10 mx-4 mt-auto flex flex-row items-center justify-center py-2">
-        <SquircleButton
-          onPress={() => bottomSheetRef.current?.expand()}
-          className="flex-grow"
-          backgroundColor={PRIMARY}
-          borderRadius={16}
-          style={{
-            paddingVertical: 16,
-            marginVertical: 4,
-          }}>
-          <Text variant="button" className="text-center">
-            Book Now
-          </Text>
-        </SquircleButton>
-      </View>
+      <View className="right-0 bottom-0 left-0 -z-10 mx-4 mt-auto flex flex-row items-center justify-center py-2"></View>
     </Container>
   );
 };
