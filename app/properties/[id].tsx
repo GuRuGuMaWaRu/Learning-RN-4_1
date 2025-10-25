@@ -21,16 +21,15 @@ import { BACKGROUND_GREY_100, PRIMARY } from '@/core/theme/colors';
 const Property = () => {
   const { id } = useLocalSearchParams();
   const defaultStyles = useDefaultStyles();
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const [datesRange, setDatesRange] = useState<{
     startDate: DateType;
     endDate: DateType;
   }>({ startDate: undefined, endDate: undefined });
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
-
   const property = PROPERTIES.find((prop) => prop.id === id) as Property | undefined;
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
+  const snapPoints = useMemo(() => ['25%', '60%'], []);
 
   const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => {
     return (
@@ -92,24 +91,6 @@ const Property = () => {
         <AmenitiesList amenities={property.amenities} />
       </ScrollView>
 
-      <SquircleButton
-        backgroundColor={PRIMARY}
-        cornerSmoothing={100}
-        preserveSmoothing
-        onPress={() => {
-          bottomSheetRef.current?.expand();
-        }}
-        className="m-8 flex flex-row items-center justify-center px-4"
-        style={{
-          paddingVertical: 16,
-        }}
-        borderRadius={24}>
-        <Ionicons name="checkmark-circle" size={20} color="white" />
-        <Text variant="button" className="mx-2 text-center">
-          Confirm
-        </Text>
-      </SquircleButton>
-
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}
@@ -117,7 +98,7 @@ const Property = () => {
         index={-1}
         enablePanDownToClose
         enableDynamicSizing={false}>
-        <BottomSheetView className="pt-14">
+        <BottomSheetView className="flex-column mt-14 flex">
           <DateTimePicker
             mode="range"
             minDate={today}
@@ -131,10 +112,46 @@ const Property = () => {
               selected_label: { color: 'white' }, // Highlight the selected day label
             }}
           />
+
+          <View className="mt-auto flex flex-row items-center justify-center py-2">
+            <SquircleButton
+              backgroundColor={PRIMARY}
+              cornerSmoothing={100}
+              preserveSmoothing
+              onPress={() => {
+                bottomSheetRef.current?.close();
+              }}
+              className="flex flex-row items-center justify-center px-4"
+              style={{
+                paddingVertical: 16,
+              }}
+              borderRadius={24}>
+              <Ionicons name="checkmark-circle" size={20} color="white" />
+              <Text variant="button" className="mx-2 text-center">
+                Confirm
+              </Text>
+            </SquircleButton>
+          </View>
         </BottomSheetView>
       </BottomSheet>
 
-      <View className="right-0 bottom-0 left-0 -z-10 mx-4 mt-auto flex flex-row items-center justify-center py-2"></View>
+      <View className="right-0 bottom-0 left-0 -z-10 mx-4 mt-auto">
+        <SquircleButton
+          backgroundColor={PRIMARY}
+          cornerSmoothing={100}
+          preserveSmoothing
+          onPress={() => {
+            bottomSheetRef.current?.expand();
+          }}
+          style={{
+            paddingVertical: 16,
+          }}
+          borderRadius={24}>
+          <Text variant="button" className="mx-2 text-center">
+            Book Now
+          </Text>
+        </SquircleButton>
+      </View>
     </Container>
   );
 };
