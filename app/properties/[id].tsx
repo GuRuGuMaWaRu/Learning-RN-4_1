@@ -16,6 +16,7 @@ import Text from '@/components/Text';
 import AmenitiesList from '@/components/properties/AmenitiesList';
 import PropertyImage from '@/components/properties/PropertyImage';
 import { PROPERTIES, today } from '@/core/constants';
+import { calendarTheme } from '@/core/theme/calendar-theme';
 import { BACKGROUND_GREY_100, PRIMARY } from '@/core/theme/colors';
 
 const Property = () => {
@@ -107,9 +108,9 @@ const Property = () => {
             onChange={handleChangeDate}
             styles={{
               ...defaultStyles,
-              today: { borderColor: 'blue', borderWidth: 1 }, // Add a border to today's date
-              selected: { backgroundColor: 'blue' }, // Highlight the selected day
-              selected_label: { color: 'white' }, // Highlight the selected day label
+              today: { borderColor: calendarTheme.today.borderColor, borderWidth: 1 }, // Add a border to today's date
+              selected: { backgroundColor: calendarTheme.selectedDay.backgroundColor }, // Highlight the selected day
+              selected_label: { color: calendarTheme.selectedDay.textColor }, // Highlight the selected day label
             }}
           />
 
