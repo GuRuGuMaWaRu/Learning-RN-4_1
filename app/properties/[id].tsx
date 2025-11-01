@@ -4,8 +4,10 @@ import BottomSheet, {
   BottomSheetBackdropProps,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { useLocalSearchParams } from 'expo-router';
+import { differenceInDays, format } from 'date-fns';
+import { router, useLocalSearchParams } from 'expo-router';
 import { SquircleButton } from 'expo-squircle-view';
+import { nanoid } from 'nanoid/non-secure';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-datepicker';
@@ -16,6 +18,7 @@ import Text from '@/components/Text';
 import AmenitiesList from '@/components/properties/AmenitiesList';
 import PropertyImage from '@/components/properties/PropertyImage';
 import { PROPERTIES, today } from '@/core/constants';
+import useShoppingCartStore from '@/core/store';
 import { calendarTheme } from '@/core/theme/calendar-theme';
 import { BACKGROUND_GREY_100, PRIMARY } from '@/core/theme/colors';
 
@@ -23,6 +26,8 @@ const Property = () => {
   const { id } = useLocalSearchParams();
   const defaultStyles = useDefaultStyles();
   const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const { addItem } = useShoppingCartStore();
 
   const [datesRange, setDatesRange] = useState<{
     startDate: DateType;
@@ -59,6 +64,18 @@ const Property = () => {
   }
 
   const imageUrl = property.images[1];
+
+  const calculateDays = () => {
+    if (!datesRange.startDate) return 0;
+    if (!datesRange.endDate) return 1;
+
+    const start = datesRange.startDate;
+    const end = datesRange.endDate;
+
+    return differenceInDays(end as Date, start as Date) + 1;
+  };
+
+  const hasSelectedDates = datesRange.startDate;
 
   return (
     <Container>
@@ -120,7 +137,26 @@ const Property = () => {
               cornerSmoothing={100}
               preserveSmoothing
               onPress={() => {
+                if (!hasSelectedDates) return;
+
+                const cartItem: ICartItem = {
+                  id: nanoid(),
+                  image: property.images[0],
+                  name: property.name,
+                  product: property.id,
+                  price_per_night: property.price_per_night,
+                  quantity: 1,
+                  startDate: format(datesRange.startDate as Date, 'yyyy-MM-dd'),
+                  endDate: datesRange.endDate
+                    ? format(datesRange.endDate as Date, 'yyyy-MM-dd')
+                    : format(datesRange.startDate as Date, 'yyyy-MM-dd'),
+                  days: calculateDays(),
+                };
+                addItem(cartItem);
+                console.log('cartItem', cartItem);
                 bottomSheetRef.current?.close();
+                setDatesRange({ startDate: undefined, endDate: undefined });
+                router.push('/checkout');
               }}
               className="flex flex-row items-center justify-center px-4"
               style={{

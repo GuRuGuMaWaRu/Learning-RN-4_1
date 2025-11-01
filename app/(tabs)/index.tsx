@@ -9,7 +9,7 @@ import { PROPERTIES } from '@/core/constants';
 export default function Home() {
   // useEffect(() => {
   //   setTimeout(() => {
-  //     router.push('/welcome');
+  //     router.push('/login');
   //   }, 1000);
   // });
   return (
