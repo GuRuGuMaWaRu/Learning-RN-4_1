@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
+import { APIProvider } from '@/core/api/api-provider';
 import theme from '@/core/constants/use-theme-config';
 import '../global.css';
 
@@ -15,11 +16,13 @@ export const unstable_settings = {
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <APIProvider>
       <ThemeProvider value={theme}>
         <KeyboardProvider>
           <BottomSheetModalProvider>{children}</BottomSheetModalProvider>
         </KeyboardProvider>
       </ThemeProvider>
+      </APIProvider>
     </GestureHandlerRootView>
   );
 };
