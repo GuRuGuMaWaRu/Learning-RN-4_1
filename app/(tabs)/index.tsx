@@ -1,15 +1,16 @@
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 
 import Container from '@/components/Container';
 import Card from '@/components/home/Card';
 import Discovery from '@/components/home/Discovery';
 import MainHeader from '@/components/home/MainHeader';
+import Text from '@/components/Text';
 import { client } from '@/core/api/client';
 import { PROPERTIES } from '@/core/constants';
 import { useQuery } from '@tanstack/react-query';
 
 export default function Home() {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['properties-list'],
     queryFn: async () => {
       const { data } = await client.get('/properties-list');
@@ -17,7 +18,15 @@ export default function Home() {
     },
   });
 
-  console.log(JSON.stringify(data, null, 2));
+  if (!isLoading)
+    return (
+      <Container>
+        <View className="flex flex-row items-center justify-center">
+          <Text>Loading...</Text>
+        </View>
+      </Container>
+    );
+
   return (
     <Container>
       <MainHeader />
