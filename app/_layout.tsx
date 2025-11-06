@@ -17,11 +17,11 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <APIProvider>
-      <ThemeProvider value={theme}>
-        <KeyboardProvider>
-          <BottomSheetModalProvider>{children}</BottomSheetModalProvider>
-        </KeyboardProvider>
-      </ThemeProvider>
+        <ThemeProvider value={theme}>
+          <KeyboardProvider>
+            <BottomSheetModalProvider>{children}</BottomSheetModalProvider>
+          </KeyboardProvider>
+        </ThemeProvider>
       </APIProvider>
     </GestureHandlerRootView>
   );
