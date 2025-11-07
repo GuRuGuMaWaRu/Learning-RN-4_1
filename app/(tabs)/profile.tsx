@@ -5,32 +5,54 @@ import { View } from 'react-native';
 import Container from '@/components/Container';
 import Header from '@/components/Header';
 import ImageWithSquircle from '@/components/ImageWithSquircle';
+import LoadingIndicator from '@/components/LoadingIndicator';
 import Text from '@/components/Text';
+import { client } from '@/core/api/client';
+import useAuth from '@/core/auth';
 import { PRIMARY } from '@/core/theme/colors';
+import { useQuery } from '@tanstack/react-query';
+import { useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
 
-const user: User = {
-  avatar:
-    'https://plus.unsplash.com/premium_photo-1755105193614-d59a8a411c56?q=80&w=1750&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  bookings: [],
-  created_at: '2022-01-01',
-  email: 'iV6Pz@example.com',
-  id: '1',
-  name: 'John Doe',
-  properties: [],
-  username: 'johndoe',
-  bookings_count: 12,
-  favorite_properties_count: 5,
+type UserStat = {
+  name: string;
+  email: string;
+  username: string;
+  favoritePropertiesCount: number;
+  bookingsCount: number;
+  avatar: string;
 };
 
 const Profile = () => {
+  const { signOut, user } = useAuth();
+
+  const { data, isLoading, refetch } = useQuery<UserStat>({
+    queryKey: ['stats'],
+    queryFn: async () => {
+      const response = await client.get('/users/stats');
+      return response.data.stats;
+    },
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
+  if (isLoading || !user || !data) {
+    return <LoadingIndicator />;
+  }
+  console.log(data);
+
   return (
     <Container>
       <Header
         title="Profile"
         headerAction={{
-          icon: 'settings-outline',
+          name: 'log-out',
           onPress: () => {
-            console.log('Settings pressed');
+            signOut();
           },
         }}
       />
@@ -52,7 +74,7 @@ const Profile = () => {
               Trips
             </Text>
             <Text variant="body" className="mx-4 text-center">
-              {user.bookings_count}
+              {data.bookingsCount}
             </Text>
           </View>
         </View>
@@ -65,7 +87,7 @@ const Profile = () => {
               Favorite
             </Text>
             <Text variant="body" className="mx-4 text-center">
-              {user.favorite_properties_count}
+              {data.favoritePropertiesCount}
             </Text>
           </View>
         </View>

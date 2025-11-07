@@ -8,7 +8,7 @@ import Text from '@/components/Text';
 type Props = {
   title: string;
   headerAction?: {
-    icon: keyof typeof Ionicons.glyphMap;
+    name: keyof typeof Ionicons.glyphMap;
     onPress: () => void;
   };
 };
@@ -31,7 +31,7 @@ const Header = ({ title, headerAction }: Props) => {
 
       {headerAction ? (
         <Pressable onPress={headerAction.onPress}>
-          <Ionicons name={headerAction.icon} size={24} color="black" />
+          <Ionicons name={headerAction.name} size={24} color="black" />
         </Pressable>
       ) : null}
     </View>
