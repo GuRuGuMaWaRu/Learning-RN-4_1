@@ -13,12 +13,12 @@ export default function Home() {
   const { data, isLoading } = useQuery({
     queryKey: ['properties-list'],
     queryFn: async () => {
-      const { data } = await client.get('/properties-list');
+      const { data } = await client.get('/properties');
       return data.properties;
     },
   });
 
-  if (!isLoading)
+  if (isLoading)
     return (
       <Container>
         <View className="flex flex-row items-center justify-center">
