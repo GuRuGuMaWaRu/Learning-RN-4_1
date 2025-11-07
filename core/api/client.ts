@@ -9,7 +9,7 @@ client.interceptors.request.use(
   (config) => {
     const data = getToken();
     if (data?.access) {
-      config.headers.Authorization = `Bearer ${data.access}`;
+      config.headers.Authorization = data.access;
     }
     return config;
   },

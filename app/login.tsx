@@ -8,16 +8,36 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Container from '@/components/Container';
 import Header from '@/components/Header';
 import Text from '@/components/Text';
+import { client } from '@/core/api/client';
+import useAuth from '@/core/auth';
 import { PRIMARY } from '@/core/theme/colors';
 
 const Login = () => {
+  const { signIn, setUser } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignIn = async () => {
-    router.push('/(tabs)');
+    try {
+      setIsLoading(true);
+
+      const response = await client.post('/users/login', {
+        email,
+        password,
+      });
+
+      setUser(response.data.user);
+
+      signIn({ access: response.data.token });
+      router.push('/');
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -64,7 +84,7 @@ const Login = () => {
               paddingVertical: 16,
             }}>
             {isLoading ? (
-              <ActivityIndicator color={'white'} />
+              <ActivityIndicator color="white" />
             ) : (
               <Text variant="button" className="text-center">
                 Sign In

@@ -1,6 +1,8 @@
-import { Tabs } from 'expo-router';
+import { Redirect, SplashScreen, Tabs } from 'expo-router';
 
+import useAuth from '@/core/auth';
 import { PRIMARY } from '@/core/theme/colors';
+import { useCallback, useEffect } from 'react';
 import { TabBarIcon } from '../../components/TabBarIcon';
 
 const commonTabOptions = {
@@ -9,6 +11,24 @@ const commonTabOptions = {
 };
 
 export default function TabLayout() {
+  const { status } = useAuth();
+
+  const hideSplash = useCallback(async () => {
+    await SplashScreen.hideAsync();
+  }, []);
+
+  useEffect(() => {
+    if (status !== 'idle') {
+      setTimeout(() => {
+        hideSplash();
+      }, 1000);
+    }
+  }, [hideSplash, status]);
+
+  if (status === 'idle' || status === 'signOut') {
+    return <Redirect href={'/welcome'} />;
+  }
+
   return (
     <Tabs
       screenOptions={{
