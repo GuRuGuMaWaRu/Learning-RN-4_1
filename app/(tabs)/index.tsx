@@ -29,7 +29,7 @@ export default function Home() {
         renderItem={({ item }) => <Card property={item} />}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        ListHeaderComponent={() => <Discovery properties={data.reverse()} />}
+        ListHeaderComponent={() => <Discovery properties={data.toReversed()} />}
       />
     </Container>
   );
