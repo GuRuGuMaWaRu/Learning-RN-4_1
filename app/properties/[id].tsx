@@ -87,16 +87,16 @@ const Property = () => {
     );
   }
 
-  const imageUrl = property.images[1];
   const hasSelectedDates = datesRange.startDate;
-  const totalPrice = calculateDays() * property.price_per_night;
+  const days = calculateDays();
+  const totalPrice = days * property.price_per_night;
 
   return (
     <Container>
       <Header title="Property" />
 
       <ScrollView style={{ flex: 1, padding: 4, backgroundColor: BACKGROUND_GREY_100 }}>
-        <PropertyImage imageUrl={imageUrl} rating={4.8} isFavorite={property.is_favorite} />
+        <PropertyImage imageUrl={property.images[1]} isFavorite={property.is_favorite} rating={5} />
 
         <View className="mx-6">
           <View className="flex flex-row items-center justify-between">
@@ -112,7 +112,7 @@ const Property = () => {
           </View>
           <View className="flex flex-row items-center">
             <Ionicons name="location" size={16} color={PRIMARY} />
-            <Text variant="body-primary" className="">
+            <Text variant="body-primary">
               {property.city}, {property.country}
             </Text>
           </View>
@@ -131,6 +131,16 @@ const Property = () => {
         enablePanDownToClose
         enableDynamicSizing={false}>
         <BottomSheetView className="flex-column mt-14 flex">
+          {/* <View className="my-4 flex flex-row items-center justify-between px-4"> */}
+          <View className="mb-4 flex flex-row items-center justify-center">
+            <Ionicons name="wallet" color={PRIMARY} size={24} />
+            <Text variant="subtitle" className="mx-4">
+              Price : ${hasSelectedDates ? totalPrice : property.price_per_night}
+              {!hasSelectedDates && ' per night'}
+            </Text>
+          </View>
+          {/* </View> */}
+
           <DateTimePicker
             mode="range"
             minDate={today}
@@ -164,12 +174,10 @@ const Property = () => {
                   endDate: datesRange.endDate
                     ? format(datesRange.endDate as Date, 'yyyy-MM-dd')
                     : format(datesRange.startDate as Date, 'yyyy-MM-dd'),
-                  days: calculateDays(),
+                  days,
                 };
                 addItem(cartItem);
-                console.log('cartItem', cartItem);
                 bottomSheetRef.current?.close();
-                router.push('/checkout');
               }}
               className="flex flex-row items-center justify-center px-4"
               style={{
@@ -186,26 +194,45 @@ const Property = () => {
       </BottomSheet>
 
       <View className="right-0 bottom-0 left-0 -z-10 mx-4 mt-auto">
-        {hasSelectedDates && (
-          <Pressable onPress={() => router.push('/checkout')} className="mb-4">
+        {hasSelectedDates ? (
+          <Pressable
+            onPress={() => bottomSheetRef.current?.expand()}
+            className="mb-4 flex-row items-center justify-center p-2">
             <Ionicons name="pricetag" size={16} color={PRIMARY} />
             <Text variant="body-primary" className="text-center">
-              Total: ${totalPrice} for {calculateDays() === 1 ? 'night' : 'nights'}
+              Total: ${totalPrice} for {days} {days === 1 ? 'night' : 'nights'}
             </Text>
           </Pressable>
+        ) : (
+          <SquircleButton
+            backgroundColor={PRIMARY}
+            cornerSmoothing={100}
+            preserveSmoothing
+            onPress={() => {
+              bottomSheetRef.current?.expand();
+            }}
+            style={{
+              paddingVertical: 16,
+            }}
+            borderRadius={24}>
+            <Text variant="button" className="mx-2 text-center">
+              Select dates
+            </Text>
+          </SquircleButton>
         )}
+
         <SquircleButton
-          backgroundColor={PRIMARY}
-          cornerSmoothing={100}
-          preserveSmoothing
           onPress={() => {
-            bottomSheetRef.current?.expand();
+            router.push('/checkout');
           }}
+          className="flex-grow"
+          backgroundColor={PRIMARY}
+          borderRadius={16}
           style={{
             paddingVertical: 16,
-          }}
-          borderRadius={24}>
-          <Text variant="button" className="mx-2 text-center">
+            marginVertical: 4,
+          }}>
+          <Text variant="button" className="text-center">
             Book Now
           </Text>
         </SquircleButton>
