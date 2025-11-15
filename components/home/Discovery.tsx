@@ -5,7 +5,7 @@ import { SquircleButton, SquircleView } from 'expo-squircle-view';
 import { Pressable, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
-import ImageWithSquircle from '@/components/ImageWithSquircle';
+import Image from '@/components/Image';
 import Text from '@/components/Text';
 
 type DiscoveryProps = {
@@ -34,7 +34,7 @@ const Discovery = ({ properties }: DiscoveryProps) => {
         data={properties}
         renderItem={({ item }) => (
           <SquircleView className="mx-2">
-            <ImageWithSquircle image={item.images[1]} width={196} height={224} />
+            <Image source={item.images[1]} style={{ width: 196, height: 224 }} />
             <SquircleView
               cornerSmoothing={100}
               preserveSmoothing
