@@ -10,7 +10,7 @@ export const useToggleFavorite = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ propertyId }: ToggleFavoriteParams) => {
-      const response = await client.post(`/favorites/${propertyId}`);
+      const response = await client.post<Property>(`/favorites/${propertyId}`);
       return response.data;
     },
     onMutate: async ({ propertyId, currentFavoriteStatus }: ToggleFavoriteParams) => {
@@ -39,8 +39,20 @@ export const useToggleFavorite = () => {
         queryClient.setQueryData(['properties'], context.previousProperties);
       }
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['properties'] });
+    onSuccess: (updatedProperty: Property, variables) => {
+      queryClient.setQueryData<Property[]>(['properties'], (old) => {
+        if (!old) return [];
+
+        return old.map((property) => {
+          if (property.id === variables.propertyId) {
+            return {
+              ...property,
+              is_favorite: updatedProperty.is_favorite,
+            };
+          }
+          return property;
+        });
+      });
     },
   });
 };
