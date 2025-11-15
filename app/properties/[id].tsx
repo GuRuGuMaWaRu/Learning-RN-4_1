@@ -9,32 +9,42 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { SquircleButton } from 'expo-squircle-view';
 import { nanoid } from 'nanoid/non-secure';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import DateTimePicker, { DateType, useDefaultStyles } from 'react-native-ui-datepicker';
 
 import Container from '@/components/Container';
 import Header from '@/components/Header';
+import LoadingIndicator from '@/components/LoadingIndicator';
 import Text from '@/components/Text';
 import AmenitiesList from '@/components/properties/AmenitiesList';
 import PropertyImage from '@/components/properties/PropertyImage';
-import { PROPERTIES, today } from '@/core/constants';
+import { client } from '@/core/api/client';
+import { today } from '@/core/constants';
 import useShoppingCartStore from '@/core/store';
 import { calendarTheme } from '@/core/theme/calendar-theme';
 import { BACKGROUND_GREY_100, PRIMARY } from '@/core/theme/colors';
+import { useQuery } from '@tanstack/react-query';
 
 const Property = () => {
   const { id } = useLocalSearchParams();
   const defaultStyles = useDefaultStyles();
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const { addItem } = useShoppingCartStore();
+  const { data: property, isLoading } = useQuery<Property>({
+    queryKey: ['property' + id],
+    queryFn: async () => {
+      const { data } = await client.get(`/properties/${id}`);
+      return data.property;
+    },
+  });
+
+  const { addItem, getTotalPrice } = useShoppingCartStore();
 
   const [datesRange, setDatesRange] = useState<{
     startDate: DateType;
     endDate: DateType;
   }>({ startDate: undefined, endDate: undefined });
 
-  const property = PROPERTIES.find((prop) => prop.id === id) as Property | undefined;
   const snapPoints = useMemo(() => ['25%', '60%'], []);
 
   const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => {
@@ -52,6 +62,20 @@ const Property = () => {
     setDatesRange({ startDate, endDate });
   };
 
+  const calculateDays = () => {
+    if (!datesRange.startDate) return 0;
+    if (!datesRange.endDate) return 1;
+
+    const start = datesRange.startDate;
+    const end = datesRange.endDate;
+
+    return differenceInDays(end as Date, start as Date) + 1;
+  };
+
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
+
   if (!property) {
     return (
       <Container>
@@ -64,18 +88,8 @@ const Property = () => {
   }
 
   const imageUrl = property.images[1];
-
-  const calculateDays = () => {
-    if (!datesRange.startDate) return 0;
-    if (!datesRange.endDate) return 1;
-
-    const start = datesRange.startDate;
-    const end = datesRange.endDate;
-
-    return differenceInDays(end as Date, start as Date) + 1;
-  };
-
   const hasSelectedDates = datesRange.startDate;
+  const totalPrice = calculateDays() * property.price_per_night;
 
   return (
     <Container>
@@ -155,7 +169,6 @@ const Property = () => {
                 addItem(cartItem);
                 console.log('cartItem', cartItem);
                 bottomSheetRef.current?.close();
-                setDatesRange({ startDate: undefined, endDate: undefined });
                 router.push('/checkout');
               }}
               className="flex flex-row items-center justify-center px-4"
@@ -173,6 +186,14 @@ const Property = () => {
       </BottomSheet>
 
       <View className="right-0 bottom-0 left-0 -z-10 mx-4 mt-auto">
+        {hasSelectedDates && (
+          <Pressable onPress={() => router.push('/checkout')} className="mb-4">
+            <Ionicons name="pricetag" size={16} color={PRIMARY} />
+            <Text variant="body-primary" className="text-center">
+              Total: ${totalPrice} for {calculateDays() === 1 ? 'night' : 'nights'}
+            </Text>
+          </Pressable>
+        )}
         <SquircleButton
           backgroundColor={PRIMARY}
           cornerSmoothing={100}

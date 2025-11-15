@@ -43,7 +43,6 @@ const Profile = () => {
   if (isLoading || !user || !data) {
     return <LoadingIndicator />;
   }
-  console.log(data);
 
   return (
     <Container>
